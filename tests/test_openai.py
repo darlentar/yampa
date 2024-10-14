@@ -3,7 +3,11 @@ import json
 import pytest
 from pathlib import Path
 
-from yampa.openai.events import ConversationItem, AudioTranscriptDelta
+from yampa.openai.events import (
+    ConversationItem,
+    AudioTranscriptDelta,
+    AudioTranscriptDone,
+)
 from yampa.openai.processors import FakeOpenAI
 
 
@@ -72,5 +76,28 @@ async def test_opanai_on_transcript_delta():
         (
             "item_AIK0wRecrZqZlLV2oUVja",
             " that",
+        ),
+    ]
+
+
+@pytest.mark.asyncio
+async def test_opanai_on_transcript_done():
+    scenario = load_scenario("ask_order")
+    received_items = []
+
+    async def on_transcript_delta_done(delta: AudioTranscriptDone):
+        received_items.append((delta.item_id, delta.transcript))
+
+    openai = FakeOpenAI(
+        events=scenario,
+        on_transcript_delta_done=on_transcript_delta_done,
+    )
+    await openai.run()
+
+    assert received_items == [
+        (
+            "item_AIK0wRecrZqZlLV2oUVja",
+            "I can help with that. Could you please provide the order number or "
+            "any details related to your order?",
         ),
     ]

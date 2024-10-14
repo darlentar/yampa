@@ -4,7 +4,7 @@ from .conversation import (
     conversation_item_created_event_handler,
     ConversationItem,
 )
-from .response import AudioTranscriptDelta
+from .response import AudioTranscriptDelta, AudioTranscriptDone
 
 __all__ = [
     "conversation_item_created_event_handler",
@@ -12,5 +12,6 @@ __all__ = [
     "make_session_update_event",
     "make_conversation_item_create_event",
     "AudioTranscriptDelta",
+    "AudioTranscriptDone",
     "ConversationItem",
 ]
