@@ -1,14 +1,35 @@
+import pytest
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Any
 import json
 
-from yampa.openai.events import session_created_handler, make_session_update_event
+from yampa.openai.events import (
+    session_created_handler,
+    make_session_update_event,
+    make_conversation_item_create_event,
+)
 
 
-def test_session_created():
-    with open(Path(__file__).resolve().parent / Path("session_created.json")) as f:
-        response = json.load(f)
+@pytest.fixture
+def get_json():
+    def _get_json(path: Path | str) -> Any:
+        with open(Path(__file__).resolve().parent / path) as f:
+            return json.load(f)
 
+    return _get_json
+
+
+@pytest.fixture
+def get_audio():
+    def _get_audio(path: Path | str) -> bytes:
+        with open(Path(__file__).resolve().parent / path, "rb") as f:
+            return f.read()
+
+    return _get_audio
+
+
+def test_session_created(get_json):
+    response = get_json("session_created.json")
     assert session_created_handler(response).session.tools == []
 
 
@@ -39,3 +60,10 @@ def test_make_session_update_event():
             ]
         },
     }
+
+
+# TODO: make custom assert to avoid long diff with audio bytes
+def test_make_conversation_item_create_event(get_audio, get_json):
+    response = get_json("conversation_item_create.json")
+    audio = get_audio("ask_orders.m4a")
+    assert make_conversation_item_create_event(audio=audio).model_dump() == response
