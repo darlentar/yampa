@@ -49,7 +49,7 @@ def make_session_update_event(tools=list[Callable]) -> SessionUpdate:
         elif get_origin(p.annotation) is Literal:
             property = {"type": "string", "enum": get_args(p.annotation)}
         else:
-            raise NotImplementedError(f"annotation {p.annotation}")
+            raise NotImplementedError(f"annotation: {p.annotation}")
         properties[p.name] = property
         required.append(p.name)
 
