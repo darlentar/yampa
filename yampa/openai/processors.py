@@ -2,6 +2,7 @@ from collections.abc import Awaitable
 from .events import (
     conversation_item_created_event_handler,
     ConversationItem,
+    AudioDelta,
     AudioTranscriptDelta,
     AudioTranscriptDone,
 )
@@ -14,11 +15,13 @@ class FakeOpenAI:
         on_item_created: Awaitable[[], [ConversationItem]] | None = None,
         on_transcript_delta: Awaitable[[], [AudioTranscriptDelta]] | None = None,
         on_transcript_delta_done: Awaitable[[], [AudioTranscriptDone]] | None = None,
+        on_audio_delta: Awaitable[[], [AudioDelta]] | None = None,
     ):
         self.events = events
         self.on_item_created = on_item_created
         self.on_transcript_delta = on_transcript_delta
         self.on_transcript_delta_done = on_transcript_delta_done
+        self.on_audio_delta = on_audio_delta
 
     async def run(self):
         for event in self.events:
@@ -37,3 +40,6 @@ class FakeOpenAI:
             ):
                 item = AudioTranscriptDone.model_validate(event)
                 await self.on_transcript_delta_done(item)
+            elif self.on_audio_delta and event["type"] == "response.audio.delta":
+                item = AudioDelta.model_validate(event)
+                await self.on_audio_delta(item)
