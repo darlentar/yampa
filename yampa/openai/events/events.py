@@ -51,6 +51,7 @@ def make_session_update_event(tools=list[Callable]) -> SessionUpdate:
         else:
             raise NotImplementedError(f"annotation: {p.annotation}")
         properties[p.name] = property
+        #TODO: Support optional args
         required.append(p.name)
 
     parameters = {"type": "object", "properties": properties, "required": required}
