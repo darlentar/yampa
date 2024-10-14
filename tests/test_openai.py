@@ -10,7 +10,7 @@ from yampa.openai.events import (
     AudioDelta,
     AudioDone,
 )
-from yampa.openai.processors import FakeOpenAI
+from yampa.openai.processors import FakeOpenAI, EventHandler
 
 
 def load_scenario(scenario_name: str) -> list[str]:
@@ -33,7 +33,7 @@ async def test_opanai_on_item_create():
 
     openai = FakeOpenAI(
         events=scenario,
-        on_item_created=on_item_created,
+        event_handler=EventHandler(on_item_created=on_item_created),
     )
     await openai.run()
 
@@ -53,7 +53,7 @@ async def test_opanai_on_transcript_delta():
 
     openai = FakeOpenAI(
         events=scenario,
-        on_transcript_delta=on_transcript_delta,
+        event_handler=EventHandler(on_transcript_delta=on_transcript_delta),
     )
     await openai.run()
 
@@ -92,7 +92,7 @@ async def test_opanai_on_transcript_done():
 
     openai = FakeOpenAI(
         events=scenario,
-        on_transcript_delta_done=on_transcript_delta_done,
+        event_handler=EventHandler(on_transcript_delta_done=on_transcript_delta_done),
     )
     await openai.run()
 
@@ -115,7 +115,7 @@ async def test_opanai_on_audio_delta():
 
     openai = FakeOpenAI(
         events=scenario,
-        on_audio_delta=on_audio_delta,
+        event_handler=EventHandler(on_audio_delta=on_audio_delta),
     )
     await openai.run()
 
@@ -142,7 +142,7 @@ async def test_opanai_on_audio_done():
 
     openai = FakeOpenAI(
         events=scenario,
-        on_audio_done=on_audio_done,
+        event_handler=EventHandler(on_audio_done=on_audio_done),
     )
     await openai.run()
 
