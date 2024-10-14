@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 # TODO: Support other types than audio
 class ConversationItemContent(BaseModel):
     type: str = "input_audio"
@@ -8,8 +9,7 @@ class ConversationItemContent(BaseModel):
 
 
 class ConversationItem(BaseModel):
-    id: str | None = None # TODO: Should make a separate type
+    id: str | None = None  # TODO: Should make a separate type
     type: str = "message"
     role: str = "user"
     content: list[ConversationItemContent]
-

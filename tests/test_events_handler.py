@@ -67,7 +67,10 @@ def test_make_session_update_event():
 def test_make_conversation_item_create_event(get_audio, get_json):
     response = get_json("conversation_item_create.json")
     audio = get_audio("ask_orders.m4a")
-    assert make_conversation_item_create_event(audio=audio).model_dump(exclude_none=True) == response
+    assert (
+        make_conversation_item_create_event(audio=audio).model_dump(exclude_none=True)
+        == response
+    )
 
 
 def test_make_conversation_item_created_event(get_audio, get_json):
