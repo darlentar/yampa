@@ -4,6 +4,7 @@ from typing import Literal, Any
 import json
 
 from yampa.openai.events import (
+    conversation_item_created_event_handler,
     session_created_handler,
     make_session_update_event,
     make_conversation_item_create_event,
@@ -67,3 +68,11 @@ def test_make_conversation_item_create_event(get_audio, get_json):
     response = get_json("conversation_item_create.json")
     audio = get_audio("ask_orders.m4a")
     assert make_conversation_item_create_event(audio=audio).model_dump() == response
+
+
+def test_make_conversation_item_created_event(get_audio, get_json):
+    response = get_json("conversation_item_created.json")
+    assert (
+        conversation_item_created_event_handler(response).event_id
+        == "event_AIJUPO0vK28UCZ9EwV9dD"
+    )
