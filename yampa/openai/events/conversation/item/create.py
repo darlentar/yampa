@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from pydub import AudioSegment
 import io
 import base64
+from .base import ConversationItem, ConversationItemContent
 
 
 def audio_to_item_create_event(audio_bytes: bytes) -> str:
@@ -13,18 +14,6 @@ def audio_to_item_create_event(audio_bytes: bytes) -> str:
 
     # Encode to base64 string
     return base64.b64encode(pcm_audio).decode()
-
-
-# TODO: Support other types than audio
-class ConversationItemContent(BaseModel):
-    type: str = "input_audio"
-    audio: str
-
-
-class ConversationItem(BaseModel):
-    type: str = "message"
-    role: str = "user"
-    content: list[ConversationItemContent]
 
 
 class ConversationItemCreate(BaseModel):

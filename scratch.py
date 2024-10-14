@@ -1,3 +1,4 @@
+import time
 import asyncio
 import base64
 import websockets
@@ -262,6 +263,8 @@ async def connect_to_server():
         # Handling incoming messages
         async for message in ws:
             event = json.loads(message)
+            with open(f"/tmp/{time.time()}.json", "w") as f:
+                json.dump(event, fp=f, indent=4)
             match event["type"]:
                 case "response.created":
                     processor.response_created(event)
