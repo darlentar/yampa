@@ -112,8 +112,10 @@ async def websocket_endpoint(websocket: WebSocket):
     # TODO: add a setter
     openai_runner.event_handler = event_handler
     await websocket.accept()
-    asyncio.create_task(openai_runner.run())
-    while True:
-        data = await websocket.receive()
-        await openai_runner.send_audio(data["bytes"])
-    openai_runner.stop_audio_send()
+
+    async def client_websocket():
+        while True:
+            data = await websocket.receive()
+            await openai_runner.send_audio(data["bytes"])
+
+    await asyncio.gather(openai_runner.run(), client_websocket())

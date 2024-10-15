@@ -33,9 +33,6 @@ class OpenAIRunner:
         payload = make_conversation_item_create_event(audio)
         self.create_event.put_nowait(payload)
 
-    async def stop_audio_send(self):
-        await self.ws.close()
-
     async def run(self):
         url = (
             "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-10-01"
