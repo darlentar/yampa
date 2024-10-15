@@ -1,6 +1,7 @@
 import asyncio
 import websockets
 import json
+
 from .processors import EventHandler
 from .events import make_conversation_item_create_event, make_session_update_event
 

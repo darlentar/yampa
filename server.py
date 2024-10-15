@@ -1,12 +1,21 @@
 import asyncio
+import base64
 import json
 import os
+import io
+from collections import defaultdict
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from yampa.openai.processors import EventHandler
 from yampa.openai.runner import OpenAIRunner
-from yampa.openai.events import AudioTranscriptDone
-from yampa.openai.events import OutputItemDone
+from yampa.openai.events import (
+    AudioTranscriptDone,
+    AudioDelta,
+    OutputItemDone,
+    AudioDone,
+)
+
+from pydub import AudioSegment
 
 app = FastAPI()
 
@@ -25,7 +34,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     def get_product_remmaining_stock(product_id: int) -> int:
@@ -42,6 +50,15 @@ async def websocket_endpoint(websocket: WebSocket):
                 "data": audio_transcript.transcript,
             }
         )
+
+    items = defaultdict(list)
+
+    async def on_audio_delta(audio_delta: AudioDelta):
+        items[audio_delta.item_id].append(audio_delta.delta)
+
+    async def on_audio_done(audio_done: AudioDone):
+        item =items[audio_done.item_id]
+        await websocket.send_json({"type": "new.audio", "data": item})
 
     openai_runner = OpenAIRunner(
         api_key=os.getenv("OPENAI_API_KEY"),
@@ -69,6 +86,8 @@ async def websocket_endpoint(websocket: WebSocket):
     event_handler = EventHandler(
         on_transcript_delta_done=on_transcript_delta_done,
         on_output_item_done=on_output_item_done,
+        on_audio_delta=on_audio_delta,
+        on_audio_done=on_audio_done,
     )
     # TODO: add a setter
     openai_runner.event_handler = event_handler
