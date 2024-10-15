@@ -40,9 +40,6 @@ class OpenAIRunner:
 
         async def handle_event(ws):
             async for message in ws:
-                m = json.loads(message)
-                print(json.loads(message)["type"])
-                print(m)
                 await self.event_handler.handle_event(json.loads(message))
 
         async def handle_audio_create(ws):

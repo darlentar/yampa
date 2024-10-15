@@ -63,7 +63,6 @@ async def websocket_endpoint(websocket: WebSocket):
                     },
                 }
             )
-            print("SendJSON", send_json)
             await openai_runner.ws.send(send_json)
             await openai_runner.ws.send(json.dumps({"type": "response.create"}))
 
