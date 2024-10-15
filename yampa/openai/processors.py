@@ -26,6 +26,7 @@ class EventHandler:
             [InputAudioTranscriptionCompleted], Awaitable[None]
         ]
         | None = None,
+        on_event: Callable[[str], Awaitable[None]] | None = None,
     ):
         self.on_item_created = on_item_created
         self.on_transcript_delta = on_transcript_delta
@@ -36,6 +37,7 @@ class EventHandler:
         self.on_input_audio_transcription_completed = (
             on_input_audio_transcription_completed
         )
+        self.on_event = on_event
 
     async def handle_event(self, event):
         handlers = {
@@ -72,6 +74,8 @@ class EventHandler:
         if callback:
             item = create_model_handler(event)
             await callback(item)
+        if self.on_event:
+            await self.on_event(event)
 
 
 class FakeOpenAI:

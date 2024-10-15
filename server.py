@@ -56,6 +56,9 @@ async def websocket_endpoint(websocket: WebSocket):
 
     items = defaultdict(list)
 
+    async def on_event(event: str):
+        await websocket.send_json({"type": "event", "data": event})
+
     async def on_audio_delta(audio_delta: AudioDelta):
         items[audio_delta.item_id].append(audio_delta.delta)
 
@@ -117,6 +120,7 @@ async def websocket_endpoint(websocket: WebSocket):
         on_audio_delta=on_audio_delta,
         on_audio_done=on_audio_done,
         on_input_audio_transcription_completed=on_input_audio_transcription_completed,
+        on_event=on_event,
     )
     # TODO: add a setter
     openai_runner.event_handler = event_handler
