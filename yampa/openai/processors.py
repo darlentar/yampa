@@ -1,4 +1,4 @@
-from collections.abc import Awaitable
+from collections.abc import Awaitable, Callable
 from .events import (
     conversation_item_created_event_handler,
     ConversationItem,
@@ -13,12 +13,14 @@ from .events import (
 class EventHandler:
     def __init__(
         self,
-        on_item_created: Awaitable[[], [ConversationItem]] | None = None,
-        on_transcript_delta: Awaitable[[], [AudioTranscriptDelta]] | None = None,
-        on_transcript_delta_done: Awaitable[[], [AudioTranscriptDone]] | None = None,
-        on_audio_delta: Awaitable[[], [AudioDelta]] | None = None,
-        on_audio_done: Awaitable[[], [AudioDone]] | None = None,
-        on_output_item_done: Awaitable[[], [OutputItemDone]] | None = None,
+        on_item_created: Callable[[ConversationItem], Awaitable[None]] | None = None,
+        on_transcript_delta: Callable[[AudioTranscriptDelta], Awaitable[None]]
+        | None = None,
+        on_transcript_delta_done: Callable[[AudioTranscriptDone], Awaitable[None]]
+        | None = None,
+        on_audio_delta: Callable[[AudioDelta], Awaitable[None]] | None = None,
+        on_audio_done: Callable[[AudioDone], Awaitable[None]] | None = None,
+        on_output_item_done: Callable[[OutputItemDone], Awaitable[None]] | None = None,
     ):
         self.on_item_created = on_item_created
         self.on_transcript_delta = on_transcript_delta
