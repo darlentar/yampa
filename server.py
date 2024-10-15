@@ -66,7 +66,9 @@ async def websocket_endpoint(websocket: WebSocket):
     async def on_input_audio_transcription_completed(
         item: InputAudioTranscriptionCompleted,
     ):
-        await websocket.send_json({"type": "new.client.transcript", "data": item.transcript})
+        await websocket.send_json(
+            {"type": "new.client.transcript", "data": item.transcript}
+        )
 
     openai_runner = OpenAIRunner(
         api_key=os.getenv("OPENAI_API_KEY"),

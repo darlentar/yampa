@@ -36,8 +36,6 @@ class OpenAIRunner:
     async def send_audio(self, audio: bytes):
         append_payload = InputAudioBufferAppend(audio=audio_to_item_create_event(audio))
         self.create_event.put_nowait(append_payload)
-        commit_payload = InputAudioBufferCommit()
-        self.create_event.put_nowait(commit_payload)
 
     async def run(self):
         url = (
@@ -55,12 +53,17 @@ class OpenAIRunner:
 
         async def handle_event(ws):
             async for message in ws:
-                await self.event_handler.handle_event(json.loads(message))
+                m = json.loads(message)
+                await self.event_handler.handle_event(m)
 
         async def handle_audio_create(ws):
             while True:
                 create_event = await self.create_event.get()
                 await ws.send(create_event.json())
+
+                commit_payload = InputAudioBufferCommit()
+                await ws.send(commit_payload.json())
+
                 await ws.send(json.dumps({"type": "response.create"}))
 
         async def handler(websocket):
