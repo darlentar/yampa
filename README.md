@@ -1,4 +1,10 @@
 # Installation
+Tested with python3.12.
+`python -m venv .venv`
+`source .venv/bin/activate`
+`pip install -r requirements.txt`
+if you need to run tests:
+`pip install -e yampa`
 To run the server you need to define `OPENAI_API_KEY` env variable.
 Run the backend dev server with `fastapi dev server.py`.
 Just open the file `index.html` (test only with Chrome sadly).
