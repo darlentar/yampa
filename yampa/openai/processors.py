@@ -61,6 +61,7 @@ class EventHandler:
             item = create_model_handler(event)
             await callback(item)
 
+
 class FakeOpenAI:
     def __init__(
         self,
