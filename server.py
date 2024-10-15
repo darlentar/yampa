@@ -34,6 +34,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     def get_product_remmaining_stock(product_id: int) -> int:
@@ -42,6 +43,10 @@ async def websocket_endpoint(websocket: WebSocket):
             return [1, 23, 244, 344, 123][product_id]
         except IndexError:
             return 0
+
+    def list_all_products() -> list[int]:
+        """List all available products. Returns a list of int."""
+        return list(range(20))
 
     async def on_transcript_delta_done(audio_transcript: AudioTranscriptDone):
         await websocket.send_json(
@@ -57,18 +62,34 @@ async def websocket_endpoint(websocket: WebSocket):
         items[audio_delta.item_id].append(audio_delta.delta)
 
     async def on_audio_done(audio_done: AudioDone):
-        item =items[audio_done.item_id]
+        item = items[audio_done.item_id]
         await websocket.send_json({"type": "new.audio", "data": item})
 
     openai_runner = OpenAIRunner(
         api_key=os.getenv("OPENAI_API_KEY"),
-        tools=[get_product_remmaining_stock],
+        tools=[get_product_remmaining_stock, list_all_products],
     )
 
     async def on_output_item_done(output_item: OutputItemDone):
+        # TODO: make it dynamic
         if output_item.item.name == "get_product_remmaining_stock":
             params = json.loads(output_item.item.arguments)
             result = get_product_remmaining_stock(**params)
+            send_json = json.dumps(
+                {
+                    "type": "conversation.item.create",
+                    "item": {
+                        "call_id": output_item.item.call_id,
+                        "type": "function_call_output",
+                        # "role": "system",
+                        "output": str(result),
+                    },
+                }
+            )
+            await openai_runner.ws.send(send_json)
+            await openai_runner.ws.send(json.dumps({"type": "response.create"}))
+        elif output_item.item.name == "list_all_products":
+            result = list_all_products()
             send_json = json.dumps(
                 {
                     "type": "conversation.item.create",
