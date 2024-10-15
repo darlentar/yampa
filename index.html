@@ -81,10 +81,15 @@
 	socket.onmessage = function (event) {
 		event = JSON.parse(event.data)
 		switch (event.type) {
-			case "new.transcript":
-				let p = document.createElement("p")
-				p.innerText = event.data
-				transcript.append(p)
+			case "new.client.transcript":
+				let cp = document.createElement("p")
+				cp.innerText = "Client: " + event.data
+				transcript.append(cp)
+				break
+			case "new.server.transcript":
+				let sp = document.createElement("p")
+				sp.innerText = "Server: " + event.data
+				transcript.append(sp)
 				break
 			case "new.audio":
 				playPcm16Base64Audio(event.data, 24000, 1);
