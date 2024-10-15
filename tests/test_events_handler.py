@@ -23,6 +23,10 @@ def test_make_session_update_event():
     ) == {
         "type": "session.update",
         "session": {
+            "input_audio_transcription": {
+                "model": "whisper-1",
+            },
+            "voice": "alloy",
             "tools": [
                 {
                     "type": "function",
@@ -37,7 +41,7 @@ def test_make_session_update_event():
                         "required": ["location", "scale"],
                     },
                 }
-            ]
+            ],
         },
     }
 

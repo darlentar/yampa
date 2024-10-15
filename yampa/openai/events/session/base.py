@@ -20,7 +20,14 @@ class Tools(BaseModel):
     parameters: SessionParameters
 
 
+class TurnDetection(BaseModel):
+    type: str = "server_vad"
+    threshold: float
+    prefix_padding_ms: int
+    silence_duration_ms: int
+
+
 class Session(BaseModel):
     tools: list[Tools]
-    turn_detection : None = None
-    voice : Literal["alloy"]
+    turn_detection: TurnDetection | None = None
+    voice: Literal["alloy"]
