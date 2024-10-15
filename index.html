@@ -1,0 +1,81 @@
+<html>
+<button type="button" id="record">Record</button>
+<button type="button" id="stop">Stop Record</button>
+<div id="transcript"></div>
+
+<script>
+	const socket = new WebSocket('ws://127.0.0.1:8000/ws');
+	transcript = document.getElementById("transcript")
+
+	socket.onopen = function (event) {
+	};
+
+	socket.onmessage = function (event) {
+		event = JSON.parse(event.data)
+		console.log(event)
+		switch (event.type) {
+			case "new.transcript":
+				let p = document.createElement("p")
+				p.innerText = event.data
+				transcript.append(p)
+		}
+	};
+
+	socket.onclose = function (event) {
+	};
+
+	function sendMessage(message) {
+		socket.send(message);
+	}
+
+
+	if (navigator.mediaDevices) {
+		console.log("getUserMedia supported.");
+
+		record = document.getElementById("record")
+		stop = document.getElementById("stop")
+		const constraints = { audio: true };
+		let chunks = [];
+
+		navigator.mediaDevices
+			.getUserMedia(constraints)
+			.then((stream) => {
+				const mediaRecorder = new MediaRecorder(stream);
+
+				record.onclick = () => {
+					mediaRecorder.start();
+					console.log(mediaRecorder.state);
+					console.log("recorder started");
+					record.style.background = "red";
+					record.style.color = "black";
+				};
+
+				stop.onclick = () => {
+					mediaRecorder.stop();
+					console.log(mediaRecorder.state);
+					console.log("recorder stopped");
+					record.style.background = "";
+					record.style.color = "";
+				};
+
+				mediaRecorder.onstop = (e) => {
+					console.log("data available after MediaRecorder.stop() called.");
+
+					const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
+					chunks = [];
+					console.log("recorder stopped");
+					sendMessage(blob)
+				};
+
+				mediaRecorder.ondataavailable = (e) => {
+					chunks.push(e.data);
+				};
+			})
+			.catch((err) => {
+				console.error(`The following error occurred: ${err}`);
+			});
+	}
+
+</script>
+
+</html>
