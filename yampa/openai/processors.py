@@ -7,6 +7,7 @@ from .events import (
     AudioTranscriptDelta,
     AudioTranscriptDone,
     OutputItemDone,
+    InputAudioTranscriptionCompleted,
 )
 
 
@@ -21,6 +22,10 @@ class EventHandler:
         on_audio_delta: Callable[[AudioDelta], Awaitable[None]] | None = None,
         on_audio_done: Callable[[AudioDone], Awaitable[None]] | None = None,
         on_output_item_done: Callable[[OutputItemDone], Awaitable[None]] | None = None,
+        on_input_audio_transcription_completed: Callable[
+            [InputAudioTranscriptionCompleted], Awaitable[None]
+        ]
+        | None = None,
     ):
         self.on_item_created = on_item_created
         self.on_transcript_delta = on_transcript_delta
@@ -28,6 +33,9 @@ class EventHandler:
         self.on_audio_delta = on_audio_delta
         self.on_audio_done = on_audio_done
         self.on_output_item_done = on_output_item_done
+        self.on_input_audio_transcription_completed = (
+            on_input_audio_transcription_completed
+        )
 
     async def handle_event(self, event):
         handlers = {
@@ -54,6 +62,10 @@ class EventHandler:
             "response.output_item.done": (
                 OutputItemDone.model_validate,
                 self.on_output_item_done,
+            ),
+            "conversation.item.input_audio_transcription.completed": (
+                InputAudioTranscriptionCompleted.model_validate,
+                self.on_input_audio_transcription_completed,
             ),
         }
         (create_model_handler, callback) = handlers.get(event["type"], (None, None))

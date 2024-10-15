@@ -3,6 +3,8 @@ from .item import (
     conversation_item_created_event_handler,
     ConversationItem,
     ConversationItemCreate,
+    ConversationItemCreated,
+    InputAudioTranscriptionCompleted,
 )
 
 __all__ = [
@@ -10,4 +12,6 @@ __all__ = [
     "conversation_item_created_event_handler",
     "ConversationItem",
     "ConversationItemCreate",
+    "ConversationItemCreated",
+    "InputAudioTranscriptionCompleted",
 ]

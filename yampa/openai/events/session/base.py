@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Literal
 
 
 class SessionParametersProperties(BaseModel):
@@ -21,3 +22,5 @@ class Tools(BaseModel):
 
 class Session(BaseModel):
     tools: list[Tools]
+    turn_detection : None = None
+    voice : Literal["alloy"]

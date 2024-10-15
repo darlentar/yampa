@@ -9,8 +9,10 @@ from yampa.openai.runner import OpenAIRunner
 from yampa.openai.events import (
     AudioTranscriptDone,
     AudioDelta,
+    ConversationItemCreated,
     OutputItemDone,
     AudioDone,
+    InputAudioTranscriptionCompleted,
 )
 
 
@@ -62,6 +64,11 @@ async def websocket_endpoint(websocket: WebSocket):
         item = items[audio_done.item_id]
         await websocket.send_json({"type": "new.audio", "data": item})
 
+    async def on_input_audio_transcription_completed(item: InputAudioTranscriptionCompleted):
+        print(item)
+        await weboscket.send_json({"type": "new.transcript", "data": item.transcript})
+
+
     openai_runner = OpenAIRunner(
         api_key=os.getenv("OPENAI_API_KEY"),
         tools=[get_product_remmaining_stock, list_all_products],
@@ -108,6 +115,7 @@ async def websocket_endpoint(websocket: WebSocket):
         on_output_item_done=on_output_item_done,
         on_audio_delta=on_audio_delta,
         on_audio_done=on_audio_done,
+        on_input_audio_transcription_completed=on_input_audio_transcription_completed,
     )
     # TODO: add a setter
     openai_runner.event_handler = event_handler

@@ -1,13 +1,26 @@
 from typing import Callable
-from .base import Session, Tools, SessionParameters, SessionParametersProperties
+from .base import (
+    Session,
+    Tools,
+    SessionParameters,
+    SessionParametersProperties,
+)
 from pydantic import BaseModel
 import inspect
 from typing import Literal, get_origin, get_args
 
 
+class InputAudioTranscription(BaseModel):
+    model: str = "whisper-1"
+
+
+class SessionUpdatePayload(Session):
+    input_audio_transcription: InputAudioTranscription | None = None
+
+
 class SessionUpdate(BaseModel):
     type: str
-    session: Session
+    session: SessionUpdatePayload
 
 
 def make_session_update_event(tools=list[Callable]) -> SessionUpdate:
@@ -40,6 +53,7 @@ def make_session_update_event(tools=list[Callable]) -> SessionUpdate:
         )
         session_tools.append(
             Tools(
+                type="function",
                 name=name,
                 description=description,
                 parameters=parameters,
@@ -47,5 +61,10 @@ def make_session_update_event(tools=list[Callable]) -> SessionUpdate:
         )
     return SessionUpdate(
         type="session.update",
-        session=Session(tools=session_tools),
+        session=SessionUpdatePayload(
+            tools=session_tools,
+            input_audio_transcription=InputAudioTranscription(model="whisper-1"),
+            turn_detection=None,
+            voice="alloy",
+        ),
     )

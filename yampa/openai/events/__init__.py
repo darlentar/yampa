@@ -4,6 +4,8 @@ from .conversation import (
     conversation_item_created_event_handler,
     ConversationItem,
     ConversationItemCreate,
+    ConversationItemCreated,
+    InputAudioTranscriptionCompleted,
 )
 from .response import (
     AudioTranscriptDelta,
@@ -24,5 +26,7 @@ __all__ = [
     "AudioTranscriptDone",
     "ConversationItem",
     "ConversationItemCreate",
+    "ConversationItemCreated",
     "OutputItemDone",
+    "InputAudioTranscriptionCompleted",
 ]

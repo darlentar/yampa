@@ -45,7 +45,7 @@ class OpenAIRunner:
 
         if self.tools:
             event = make_session_update_event(tools=self.tools)
-            await self.ws.send(event.json(exclude_none=True))
+            await self.ws.send(event.json(exclude_unset=True))
 
         async def handle_event(ws):
             async for message in ws:

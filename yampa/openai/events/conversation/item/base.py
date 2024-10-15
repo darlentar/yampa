@@ -12,4 +12,9 @@ class ConversationItem(BaseModel):
     id: str | None = None  # TODO: Should make a separate type
     type: str = "message"
     role: str = "user"
-    content: list[ConversationItemContent]
+    content: list[ConversationItemContent] | None = None
+
+
+class InputAudioTranscriptionCompleted(BaseModel):
+    item_id: str
+    transcript: str
