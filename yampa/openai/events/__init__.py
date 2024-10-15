@@ -14,6 +14,7 @@ from .response import (
     AudioDone,
     OutputItemDone,
 )
+from .input_audio_buffer import InputAudioBufferAppend, InputAudioBufferCommit
 
 __all__ = [
     "conversation_item_created_event_handler",
@@ -29,4 +30,6 @@ __all__ = [
     "ConversationItemCreated",
     "OutputItemDone",
     "InputAudioTranscriptionCompleted",
+    "InputAudioBufferAppend",
+    "InputAudioBufferCommit",
 ]

@@ -4,10 +4,14 @@ import json
 
 from .processors import EventHandler
 from .events import (
-    make_conversation_item_create_event,
     make_session_update_event,
-    ConversationItemCreate,
+    InputAudioBufferAppend,
+    InputAudioBufferCommit,
 )
+
+from pydantic import BaseModel
+
+from yampa.utils import audio_to_item_create_event
 
 
 class OpenAIRunner:
@@ -20,7 +24,7 @@ class OpenAIRunner:
         self.api_key = api_key
         self.event_handler = EventHandler() if event_handler is None else event_handler
         self.tools = [] if tools is None else tools
-        self.create_event: asyncio.Queue[ConversationItemCreate] = asyncio.Queue()
+        self.create_event: asyncio.Queue[BaseModel] = asyncio.Queue()
         self._ws = None
 
     @property
@@ -30,8 +34,10 @@ class OpenAIRunner:
         return self._ws
 
     async def send_audio(self, audio: bytes):
-        payload = make_conversation_item_create_event(audio)
-        self.create_event.put_nowait(payload)
+        append_payload = InputAudioBufferAppend(audio=audio_to_item_create_event(audio))
+        self.create_event.put_nowait(append_payload)
+        commit_payload = InputAudioBufferCommit()
+        self.create_event.put_nowait(commit_payload)
 
     async def run(self):
         url = (
