@@ -4,7 +4,7 @@ import pytest
 from pathlib import Path
 
 from yampa.openai.events import (
-    ConversationItem,
+    ConversationItemCreate,
     AudioTranscriptDelta,
     AudioTranscriptDone,
     AudioDelta,
@@ -28,7 +28,7 @@ async def test_opanai_on_item_create():
     scenario = load_scenario("ask_order")
     received_items = []
 
-    async def on_item_created(item: ConversationItem):
+    async def on_item_created(item: ConversationItemCreate):
         received_items.append(item.item.id)
 
     openai = FakeOpenAI(

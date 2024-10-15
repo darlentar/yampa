@@ -16,7 +16,7 @@ def test_session_created(get_json):
 def test_make_session_update_event():
     def get_weather(location: str, scale: Literal["C", "F", "K"]) -> str:
         """Get the weather at a given location."""
-        pass
+        return ""
 
     assert make_session_update_event(tools=[get_weather]).model_dump(
         exclude_none=True

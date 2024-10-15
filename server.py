@@ -1,8 +1,6 @@
 import asyncio
-import base64
 import json
 import os
-import io
 from collections import defaultdict
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,7 +13,6 @@ from yampa.openai.events import (
     AudioDone,
 )
 
-from pydub import AudioSegment
 
 app = FastAPI()
 
@@ -73,6 +70,8 @@ async def websocket_endpoint(websocket: WebSocket):
     async def on_output_item_done(output_item: OutputItemDone):
         # TODO: make it dynamic
         if output_item.item.name == "get_product_remmaining_stock":
+            if output_item.item.arguments is None:
+                raise ValueError("arguments can't be None")
             params = json.loads(output_item.item.arguments)
             result = get_product_remmaining_stock(**params)
             send_json = json.dumps(
@@ -89,7 +88,7 @@ async def websocket_endpoint(websocket: WebSocket):
             await openai_runner.ws.send(send_json)
             await openai_runner.ws.send(json.dumps({"type": "response.create"}))
         elif output_item.item.name == "list_all_products":
-            result = list_all_products()
+            list_products_result = list_all_products()
             send_json = json.dumps(
                 {
                     "type": "conversation.item.create",
@@ -97,7 +96,7 @@ async def websocket_endpoint(websocket: WebSocket):
                         "call_id": output_item.item.call_id,
                         "type": "function_call_output",
                         # "role": "system",
-                        "output": str(result),
+                        "output": str(list_products_result),
                     },
                 }
             )

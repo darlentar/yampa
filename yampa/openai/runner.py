@@ -3,7 +3,11 @@ import websockets
 import json
 
 from .processors import EventHandler
-from .events import make_conversation_item_create_event, make_session_update_event
+from .events import (
+    make_conversation_item_create_event,
+    make_session_update_event,
+    ConversationItemCreate,
+)
 
 
 class OpenAIRunner:
@@ -16,8 +20,14 @@ class OpenAIRunner:
         self.api_key = api_key
         self.event_handler = EventHandler() if event_handler is None else event_handler
         self.tools = [] if tools is None else tools
-        self.create_event = asyncio.Queue()
-        self.ws = None
+        self.create_event: asyncio.Queue[ConversationItemCreate] = asyncio.Queue()
+        self._ws = None
+
+    @property
+    def ws(self):
+        if self._ws is None:
+            raise ValueError("there is no available weboscket")
+        return self._ws
 
     async def send_audio(self, audio: bytes):
         payload = make_conversation_item_create_event(audio)
@@ -34,7 +44,8 @@ class OpenAIRunner:
             "Authorization": f"Bearer {self.api_key}",
             "OpenAI-Beta": "realtime=v1",
         }
-        self.ws = await websockets.connect(url, extra_headers=headers)
+        self._ws = await websockets.connect(url, extra_headers=headers)
+
         if self.tools:
             event = make_session_update_event(tools=self.tools)
             await self.ws.send(event.json(exclude_none=True))
