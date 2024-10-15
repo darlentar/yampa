@@ -6,6 +6,7 @@ from .events import (
     AudioDone,
     AudioTranscriptDelta,
     AudioTranscriptDone,
+    OutputItemDone,
 )
 
 
@@ -17,12 +18,14 @@ class EventHandler:
         on_transcript_delta_done: Awaitable[[], [AudioTranscriptDone]] | None = None,
         on_audio_delta: Awaitable[[], [AudioDelta]] | None = None,
         on_audio_done: Awaitable[[], [AudioDone]] | None = None,
+        on_output_item_done: Awaitable[[], [OutputItemDone]] | None = None,
     ):
         self.on_item_created = on_item_created
         self.on_transcript_delta = on_transcript_delta
         self.on_transcript_delta_done = on_transcript_delta_done
         self.on_audio_delta = on_audio_delta
         self.on_audio_done = on_audio_done
+        self.on_output_item_done = on_output_item_done
 
     async def handle_event(self, event):
         if self.on_item_created and event["type"] == "conversation.item.created":
@@ -46,6 +49,10 @@ class EventHandler:
         elif self.on_audio_done and event["type"] == "response.audio.done":
             item = AudioDone.model_validate(event)
             await self.on_audio_done(item)
+        # TODO: NOT TESTED
+        elif self.on_output_item_done and event["type"] == "response.output_item.done":
+            item = OutputItemDone.model_validate(event)
+            await self.on_output_item_done(item)
 
 
 class FakeOpenAI:

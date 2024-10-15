@@ -20,6 +20,8 @@ def make_session_update_event(tools=list[Callable]) -> SessionUpdate:
         for p in inspect.signature(tool).parameters.values():
             if p.annotation is str:
                 property = {"type": "string"}
+            if p.annotation is int:
+                property = {"type": "integer"}
             elif get_origin(p.annotation) is Literal:
                 property = {"type": "string", "enum": get_args(p.annotation)}
             else:

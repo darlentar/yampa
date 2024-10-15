@@ -1,7 +1,4 @@
-import pytest
-from pathlib import Path
-from typing import Literal, Any
-import json
+from typing import Literal
 
 from yampa.openai.events import (
     conversation_item_created_event_handler,
@@ -9,24 +6,6 @@ from yampa.openai.events import (
     make_session_update_event,
     make_conversation_item_create_event,
 )
-
-
-@pytest.fixture
-def get_json():
-    def _get_json(path: Path | str) -> Any:
-        with open(Path(__file__).resolve().parent / path) as f:
-            return json.load(f)
-
-    return _get_json
-
-
-@pytest.fixture
-def get_audio():
-    def _get_audio(path: Path | str) -> bytes:
-        with open(Path(__file__).resolve().parent / path, "rb") as f:
-            return f.read()
-
-    return _get_audio
 
 
 def test_session_created(get_json):
