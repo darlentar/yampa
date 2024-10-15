@@ -30,32 +30,36 @@ class EventHandler:
         self.on_output_item_done = on_output_item_done
 
     async def handle_event(self, event):
-        if self.on_item_created and event["type"] == "conversation.item.created":
-            item = conversation_item_created_event_handler(event)
-            await self.on_item_created(item)
-        elif (
-            self.on_transcript_delta
-            and event["type"] == "response.audio_transcript.delta"
-        ):
-            item = AudioTranscriptDelta.model_validate(event)
-            await self.on_transcript_delta(item)
-        elif (
-            self.on_transcript_delta_done
-            and event["type"] == "response.audio_transcript.done"
-        ):
-            item = AudioTranscriptDone.model_validate(event)
-            await self.on_transcript_delta_done(item)
-        elif self.on_audio_delta and event["type"] == "response.audio.delta":
-            item = AudioDelta.model_validate(event)
-            await self.on_audio_delta(item)
-        elif self.on_audio_done and event["type"] == "response.audio.done":
-            item = AudioDone.model_validate(event)
-            await self.on_audio_done(item)
-        # TODO: NOT TESTED
-        elif self.on_output_item_done and event["type"] == "response.output_item.done":
-            item = OutputItemDone.model_validate(event)
-            await self.on_output_item_done(item)
-
+        handlers = {
+            "conversation.item.created": (
+                conversation_item_created_event_handler,
+                self.on_item_created,
+            ),
+            "response.audio_transcript.delta": (
+                AudioTranscriptDelta.model_validate,
+                self.on_transcript_delta,
+            ),
+            "response.audio_transcript.done": (
+                AudioTranscriptDone.model_validate,
+                self.on_transcript_delta_done,
+            ),
+            "response.audio.delta": (
+                AudioDelta.model_validate,
+                self.on_audio_delta,
+            ),
+            "response.audio.done": (
+                AudioDone.model_validate,
+                self.on_audio_done,
+            ),
+            "response.output_item.done": (
+                OutputItemDone.model_validate,
+                self.on_output_item_done,
+            ),
+        }
+        (create_model_handler, callback) = handlers.get(event["type"], (None, None))
+        if callback:
+            item = create_model_handler(event)
+            await callback(item)
 
 class FakeOpenAI:
     def __init__(
