@@ -8,23 +8,21 @@
 	const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 	let globalCurrentTime = audioContext.currentTime; // Track time across multiple calls
 
-	function playPcm16Base64Audio(base64Array, sampleRate = 16000, numChannels = 1) {
+	function playPcm16Base64Audio(base64String, sampleRate = 16000, numChannels = 1) {
 		// Use globalCurrentTime to ensure that multiple function calls are scheduled properly
 		let startTime = Math.max(globalCurrentTime, audioContext.currentTime); // Ensure it's at least the current audio context time
 
-		base64Array.forEach(base64String => {
-			// Decode the base64 string to an ArrayBuffer
-			const audioData = base64ToArrayBuffer(base64String);
+		// Decode the base64 string to an ArrayBuffer
+		const audioData = base64ToArrayBuffer(base64String);
 
-			// Convert PCM 16-bit little-endian to AudioBuffer
-			const audioBuffer = convertPcm16ToAudioBuffer(audioData, audioContext, sampleRate, numChannels);
+		// Convert PCM 16-bit little-endian to AudioBuffer
+		const audioBuffer = convertPcm16ToAudioBuffer(audioData, audioContext, sampleRate, numChannels);
 
-			// Schedule the audio to play after the previous one finishes
-			playAudioBuffer(audioBuffer, audioContext, startTime);
+		// Schedule the audio to play after the previous one finishes
+		playAudioBuffer(audioBuffer, audioContext, startTime);
 
-			// Increment startTime for the next audio clip
-			startTime += audioBuffer.duration; // This makes sure the next clip is scheduled after the current one ends
-		});
+		// Increment startTime for the next audio clip
+		startTime += audioBuffer.duration; // This makes sure the next clip is scheduled after the current one ends
 
 		// Update globalCurrentTime after the current array is scheduled
 		globalCurrentTime = startTime;
@@ -95,7 +93,7 @@
 				transcript.append(sp)
 				break
 			case "new.audio":
-				playPcm16Base64Audio([event.data], 24000, 1);
+				playPcm16Base64Audio(event.data, 24000, 1);
 				break
 		}
 	};
