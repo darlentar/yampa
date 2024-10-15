@@ -61,10 +61,11 @@ async def websocket_endpoint(websocket: WebSocket):
 
     async def on_audio_delta(audio_delta: AudioDelta):
         items[audio_delta.item_id].append(audio_delta.delta)
+        await websocket.send_json({"type": "new.audio", "data": audio_delta.delta})
 
     async def on_audio_done(audio_done: AudioDone):
         item = items[audio_done.item_id]
-        await websocket.send_json({"type": "new.audio", "data": item})
+        #await websocket.send_json({"type": "new.audio", "data": item})
 
     async def on_input_audio_transcription_completed(
         item: InputAudioTranscriptionCompleted,

@@ -95,7 +95,7 @@
 				transcript.append(sp)
 				break
 			case "new.audio":
-				playPcm16Base64Audio(event.data, 24000, 1);
+				playPcm16Base64Audio([event.data], 24000, 1);
 				break
 		}
 	};
