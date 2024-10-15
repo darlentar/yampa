@@ -29,7 +29,7 @@ app.add_middleware(
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     def get_product_remmaining_stock(product_id: int) -> int:
-        """Get product remaining given an id."""
+        """Get product remaining stock given a product id."""
         try:
             return [1, 23, 244, 344, 123][product_id]
         except IndexError:
